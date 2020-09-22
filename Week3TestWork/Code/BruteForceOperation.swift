@@ -10,27 +10,32 @@ import Foundation
 
 class BruteForceOperation: Operation {
     
-    let characterArray = Consts.characterArray
-    
-    var password = ""
-    
-    var startIndexArray = [Int]()
-    var endIndexArray = [Int]()
-    var maxIndexArray = 0
-    
     var result = String()
     
-    init(password: String) {
+    private let characterArray = Consts.characterArray
+    
+    private var password = ""
+    
+    private var startIndexArray = [Int]()
+    private var endIndexArray = [Int]()
+    private var maxIndexArray = 0
+    
+    private var startString: String
+    private var endString: String
+    
+    init(password: String, startString: String, endString: String) {
         self.password = password
+        self.startString = startString
+        self.endString = endString
     }
     
     override func main() {
-        result = bruteForce(startString: "0000", endString: "ZZZZ") ?? "Error"
+        result = bruteForce(startString: startString, endString: endString) ?? "Error"
     }
     
     // Возвращает подобранный пароль
     private func bruteForce(startString: String, endString: String) -> String? {
-
+        
         let inputPassword = password
         var startIndexArray = [Int]()
         var endIndexArray = [Int]()
@@ -52,6 +57,11 @@ class BruteForceOperation: Operation {
         
         // Цикл подбора пароля
         while true {
+            
+            //Проверка статуса
+            if isCancelled {
+                return nil
+            }
             
             // Формируем строку проверки пароля из элементов массива символов
             let currentPass = self.characterArray[currentIndexArray[0]] + self.characterArray[currentIndexArray[1]] + self.characterArray[currentIndexArray[2]] + self.characterArray[currentIndexArray[3]]

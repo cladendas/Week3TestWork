@@ -62,20 +62,46 @@ class ViewController: UIViewController {
     private func start() {
         let startTime = Date()
 
-        var result: String?
-
-        let operation = BruteForceOperation(password: password)
+        //Создал три операции и передал им разные дипазоны значений для подбора пароля
+        //Как только одна из операций заканчивает работу, то у всех выставляется isCanceled = true, данное св-во проверяется в цикле каждой операции: if isCanceled == false - продолжить цикл
+        let operationFirst = BruteForceOperation(password: password, startString: "0000", endString: "ZZZZ")
+        let operationSecond = BruteForceOperation(password: password, startString: "0000", endString: "zzzz")
+        let operationThird = BruteForceOperation(password: password, startString: "aaaa", endString: "ZZZZ")
         
-        operation.completionBlock = {
-            result = operation.result
-            
-            DispatchQueue.main.async {
-                self.stop(password: result ?? "Error", startTime: startTime)
-                print("конец")
-            }
+        operationFirst.completionBlock = {
+            self.completionBlock(startTime: startTime, operation: operationFirst)
         }
         
-        self.queue.addOperation(operation)
+        operationSecond.completionBlock = {
+            self.completionBlock(startTime: startTime, operation: operationSecond)
+        }
+        
+        operationThird.completionBlock = {
+            self.completionBlock(startTime: startTime, operation: operationThird)
+        }
+        
+        self.queue.addOperation(operationFirst)
+        self.queue.addOperation(operationSecond)
+        self.queue.addOperation(operationThird)
+    }
+    
+    ///Функция для вызова в completionBlock операции
+    ///Если операция вернёт результат != "Error", то в очереди queue все будут отменены, если нет, то будет проверено сколько операций в очереди: если осталась одна операция (текущая), то вызываем stop
+    private func completionBlock(startTime: Date, operation: BruteForceOperation) {
+        var result: String = "Error"
+        
+        result = operation.result
+        
+        if result != "Error" {
+            self.queue.cancelAllOperations()
+            DispatchQueue.main.async {
+                self.stop(password: result, startTime: startTime)
+            }
+        } else if queue.operationCount == 1 {
+            DispatchQueue.main.async {
+                self.stop(password: result, startTime: startTime)
+            }
+        }
     }
     
     //Обновляем UI
