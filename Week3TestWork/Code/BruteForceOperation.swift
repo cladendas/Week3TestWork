@@ -12,14 +12,7 @@ class BruteForceOperation: Operation {
     
     var result = String()
     
-    private let characterArray = Consts.characterArray
-    
     private var password = ""
-    
-    private var startIndexArray = [Int]()
-    private var endIndexArray = [Int]()
-    private var maxIndexArray = 0
-    
     private var startString: String
     private var endString: String
     
@@ -36,10 +29,12 @@ class BruteForceOperation: Operation {
     // Возвращает подобранный пароль
     private func bruteForce(startString: String, endString: String) -> String? {
         
-        let inputPassword = password
+        let characterArray = Consts.characterArray
         var startIndexArray = [Int]()
         var endIndexArray = [Int]()
         let maxIndexArray = characterArray.count
+        
+        let inputPassword = password
         
         // Создает массивы индексов из входных строк
         for char in startString {
@@ -56,15 +51,10 @@ class BruteForceOperation: Operation {
         var currentIndexArray = startIndexArray
         
         // Цикл подбора пароля
-        while true {
-            
-            //Проверка статуса
-            if isCancelled {
-                return nil
-            }
+        while !isCancelled {
             
             // Формируем строку проверки пароля из элементов массива символов
-            let currentPass = self.characterArray[currentIndexArray[0]] + self.characterArray[currentIndexArray[1]] + self.characterArray[currentIndexArray[2]] + self.characterArray[currentIndexArray[3]]
+            let currentPass = characterArray[currentIndexArray[0]] + characterArray[currentIndexArray[1]] + characterArray[currentIndexArray[2]] + characterArray[currentIndexArray[3]]
             
             // Выходим из цикла если пароль найден, или, если дошли до конца массива индексов
             if inputPassword == currentPass {
